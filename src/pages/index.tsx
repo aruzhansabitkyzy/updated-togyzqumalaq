@@ -54,10 +54,10 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-center justify-between p-5 bg-gray-300 h-full">
+    <div className="flex items-center justify-between p-5 bg-gray-300 h-[calc(100vh-120px)]">
       {(mutationCreate.isPending || mutationJoin.isPending) && <Loading />}
 
-      <div className="flex flex-col gap-5 justify-center w-1/2">
+      <div className="flex flex-col gap-5 justify-center w-1/2 h-full">
         <h1 className="text-xl">Welcome to Togyzqumalaq Online!</h1>
         <h2>
           Discover and master the traditional Kazakh game of strategy and skill!

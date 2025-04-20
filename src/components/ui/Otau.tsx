@@ -31,7 +31,9 @@ export default function Otau({
       onMouseLeave={onMouseLeave}
     >
       <div className="absolute top-0 right-0 size-7 bg-white shadow-md rounded-full text-center z-10 bg-opacity-50">
-        <p className="!opacity-100 font-semibold">{isTuzdyq ? "☆" :quantity}</p>
+        <p className="!opacity-100 font-semibold">
+          {isTuzdyq ? "☆" : quantity}
+        </p>
       </div>
       {isTuzdyq ? (
         <Ball type="tuzdyq" />

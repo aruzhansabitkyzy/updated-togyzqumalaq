@@ -6,6 +6,7 @@ import { resetGame, leaveRoom, lsGet } from "../services/api";
 import { useGameSync } from "../hooks/useGameSync";
 import Modal from "./modals/GameActions";
 import { PlayerTablo } from "./PlayerTablo";
+import Loading from "./ui/Loading";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -66,22 +67,25 @@ export const Sidebar = () => {
 
   return (
     <>
-      <div className="h-full flex flex-col justify-between items-center">
+      {(resetMutation.isPending || leaveMutation.isPending) && <Loading />}
+      <div className="w-1/4 h-[calc(100vh-200px)] flex flex-col justify-between items-center px-5">
         <PlayerTablo
           player={opponentUser?.[0]}
           currentTurn={currentPlayerTurn}
         />
 
-        <div className="flex flex-col gap-3">
+        <div className="flex justify-center gap-3 w-1/4">
           <Button
             text="Reset"
             onClick={() => setIsResetModalOpen(true)}
             disabled={resetMutation.isPending}
+            additionalStyle="!w-fit"
           />
           <Button
             text="Exit"
             onClick={() => setIsLeaveRoomModalOpen(true)}
             disabled={leaveMutation.isPending}
+            additionalStyle="!w-fit"
           />
         </div>
 

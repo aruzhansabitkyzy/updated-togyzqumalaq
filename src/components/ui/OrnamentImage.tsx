@@ -1,7 +1,11 @@
-const OrnamentImage = (props: { width: number; height: number; style?: string }) => {
+const OrnamentImage = (props: {
+  width: number;
+  height: number;
+  style?: string;
+}) => {
   return (
     <img
-      src={"/assets/ornament4.png"}
+      src={"/assets/ornament.png"}
       alt=""
       width={props.width}
       height={props.height}

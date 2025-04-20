@@ -1,5 +1,6 @@
 import React from "react";
 import { Player } from "../types";
+import { lsGet } from "../services/api";
 
 interface PlayerTabloProps {
   player?: Player;
@@ -20,8 +21,8 @@ export const PlayerTablo = React.memo(
     return (
       <div
         className={` ${
-          player.id === currentTurn ? "bg-yellow-800" : "bg-gray-500"
-        } rounded-lg p-3 shadow-md flex flex-col items-center gap-3`}
+          player.id === currentTurn ? "bg-yellow-500" : "bg-gray-500"
+        } rounded-lg p-3 shadow-md flex flex-col items-center gap-3 w-full`}
       >
         <p>Name: {player.name}</p>
         <p>Score: {player.score}</p>

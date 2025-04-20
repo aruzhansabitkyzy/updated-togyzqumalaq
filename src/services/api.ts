@@ -126,9 +126,6 @@ export const joinRoom = async ({
     }
     return otau;
   });
-  console.log("Board with new player" + player.id);
-  console.log(boardWithPlayers);
-  console.log("Board before" + JSON.stringify(gameData.board));
 
   if (gameData.status === "waiting") {
     await updateDoc(gameRef, {
@@ -138,8 +135,6 @@ export const joinRoom = async ({
       currentTurn: player.id,
     });
   }
-
-  console.log("Board after: " + JSON.stringify(gameData.board));
 };
 
 interface LeaveRoomParams {
