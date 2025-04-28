@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Ball } from "./Ball";
 import { BallRendering } from "../BallsRendering";
 
@@ -23,7 +22,7 @@ export default function Otau({
 
   return (
     <div
-      className={`bg-orange-50 rounded-md p-3 h-40 w-20 relative cursor-pointer shadow-md border-2 border-solid border-gray-500 overflow-hidden ${
+      className={`bg-orange-50 rounded-md p-3 h-44 w-20 relative cursor-pointer shadow-md border-2 border-solid border-gray-500 overflow-hidden ${
         isHighlighted && highlight
       }`}
       onClick={onClick}
@@ -53,7 +52,7 @@ export default function Otau({
               gap="gap-0"
               spaceY="space-y-2"
               flex="justify-between"
-              position="absolute top-3 left-6"
+              position="absolute top-8 left-6"
             />
           )}
           {quantity > 20 && (
@@ -62,7 +61,7 @@ export default function Otau({
               gap="gap-2"
               spaceY="space-y-2"
               flex="justify-between"
-              position="absolute top-3 left-8"
+              position="absolute top-8 left-8"
             />
           )}
         </>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../components/Button";
@@ -67,6 +67,11 @@ export default function Home() {
           unique board. Immerse yourself in the rich culture of Kazakhstan while
           challenging your strategic thinking and decision-making skills.
         </h4>
+        <Button
+          text={"Rules"}
+          onClick={() => navigate("/rules")}
+          additionalStyle="w-fit bg-transparent text-gray-900 py-1 border-2 border-gray-900 hover:bg-gray-900 hover:text-white"
+        />
       </div>
 
       <div className="w-1/2 flex flex-col gap-10 items-center">

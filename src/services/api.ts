@@ -9,7 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { initBoard } from "../utils/initialBoard";
-import { Player, GameData, OtauInfo } from "../types";
+import { Player, GameData, OtauInfo, GameParams } from "../types";
 import { db } from "../firebase";
 
 export const lsGet = <T>(key: string, defaultValue: T) => {
@@ -28,9 +28,9 @@ interface CreateRoomParams {
 }
 
 export const initialBoardWithPlayersId = async (gameId: string) => {
-  const gameData = await getData(gameId);
+  const { data } = await getData(gameId);
   const currentUserId = lsGet("userId", "");
-  const opponentUser = gameData?.players.filter((player) => {
+  const opponentUser = data?.players.filter((player) => {
     return player.id !== currentUserId;
   })[0];
 
@@ -38,12 +38,12 @@ export const initialBoardWithPlayersId = async (gameId: string) => {
     if (i >= 0 && i <= 8) {
       return {
         ...otau,
-        playerId: currentUserId, // Just assign the ID string
+        playerId: currentUserId,
       };
     } else {
       return {
         ...otau,
-        playerId: opponentUser?.id || "-1", // Just assign the ID string
+        playerId: opponentUser?.id || "-1",
       };
     }
   });
@@ -100,12 +100,17 @@ export const joinRoom = async ({
   name,
 }: JoinRoomParams): Promise<string | void> => {
   lsSet("userName", name);
+  lsSet("id", room);
   const gameRef = doc(db, "room", room);
   const docSnap = await getDoc(gameRef);
   const gameData = docSnap.data();
 
   if (!gameData) {
     return "Not found";
+  }
+  if (gameData.players.length >= 2) {
+    alert("Room is full");
+    return "Room is full";
   }
 
   const player: Player = {
@@ -137,68 +142,83 @@ export const joinRoom = async ({
   }
 };
 
-interface LeaveRoomParams {
-  room: string;
-}
-
 export const leaveRoom = async ({
   room,
-}: LeaveRoomParams): Promise<string | void> => {
-  const user = lsGet("userId", "");
-  const gameData = await getData(room);
-  const gameRef = doc(db, "room", room);
+}: GameParams): Promise<string | void> => {
+  try {
+    const user = lsGet("userId", "");
 
-  if (!gameData) {
-    return "Not found";
-  }
+    if (!user) {
+      console.error("No user ID found in local storage");
+      return "No user ID found";
+    }
 
-  const player = gameData.players.find((p: Player) => p.id === user);
+    if (!room) {
+      console.error("No room ID provided");
+      return "No room ID provided";
+    }
 
-  const updatedBoard = gameData.board.map((otau: OtauInfo) => {
-    if (otau.playerId === user) {
+    console.log("Attempting to leave room:", room, "User:", user);
+
+    const { data, gameRef } = await getData(room);
+
+    if (!data || !gameRef) {
+      console.error("Failed to retrieve game data or reference");
+      return "Game not found or error occurred";
+    }
+
+    const updatedBoard = data.board.map((otau) => {
+      if (otau.playerId === user) {
+        return {
+          ...otau,
+          tuzdyq: false,
+          count: 9,
+          playerId: "-1",
+        };
+      }
       return {
         ...otau,
         tuzdyq: false,
         count: 9,
-        playerId: "-1",
+        playerId: otau.playerId,
       };
-    }
-    return {
-      ...otau,
-      tuzdyq: false,
-      count: 9,
-    };
-  });
+    });
 
-  const updatedPlayers = gameData.players
-    .filter((p: Player) => p.id !== user)
-    .map((p: Player) => ({
-      ...p,
-      score: 0,
+    const removingPlayer = data.players.find((p) => p.id === user);
+    arrayRemove(removingPlayer);
+    const updatedPlayers = {
+      ...data.players[0],
       tuzdyqOtauId: -1,
-    }));
+      score: 0,
+    };
 
-  await updateDoc(gameRef, {
-    board: updatedBoard,
-    status: "waiting",
-    players: updatedPlayers,
-    currentTurn: updatedPlayers[0],
-  });
+    const newCurrentTurn = updatedPlayers?.id;
 
-  if (gameData.players.length === 1) {
-    await deleteDoc(gameRef);
+    if (data?.players?.length === 0) {
+      await deleteDoc(gameRef);
+    } else {
+      const updatedGameData = {
+        ...data,
+        board: updatedBoard,
+        status: "waiting",
+        players: [updatedPlayers],
+        currentTurn: newCurrentTurn,
+      };
+
+      await setDoc(gameRef, updatedGameData, { merge: true });
+    }
+
+    return "Successfully left game";
+  } catch (error) {
+    return `Error leaving game: ${error}`;
   }
 };
 
-interface ResetGameParams {
-  room: string;
-}
-
 export const resetGame = async ({
   room,
-}: ResetGameParams): Promise<string | void> => {
-  const gameRef = doc(db, "room", room);
-  const docSnap = await getDoc(gameRef);
+}: GameParams): Promise<string | void> => {
+  const docRef = doc(db, "room", room);
+  const docSnap = await getDoc(docRef);
   const gameData = docSnap.data();
 
   if (!gameData) {
@@ -208,7 +228,7 @@ export const resetGame = async ({
 
   const board = await initialBoardWithPlayersId(room);
 
-  await updateDoc(gameRef, {
+  await updateDoc(docRef, {
     board: board,
     winner: null,
     players: gameData.players.map((player: Player) => {
@@ -217,12 +237,33 @@ export const resetGame = async ({
   });
 };
 
-export const getData = async (
-  gameId: string
-): Promise<GameData | undefined> => {
-  const docRef = doc(db, "room", gameId);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data() as GameData;
+export const getData = async (gameId: string) => {
+  try {
+    // Validate the gameId
+    if (!gameId || typeof gameId !== "string") {
+      console.error("Invalid gameId provided to getData:", gameId);
+      return { data: null, gameRef: null };
+    }
+
+    // Get reference and snapshot
+    const gameRef = doc(db, "room", gameId);
+    const docSnap = await getDoc(gameRef);
+
+    // Check if document exists
+    if (!docSnap.exists()) {
+      console.error("Game document does not exist:", gameId);
+      return { data: null, gameRef };
+    }
+
+    // Get the data
+    const data = docSnap.data() as GameData;
+    console.log("Game data retrieved:", JSON.stringify(data));
+
+    return { data, gameRef };
+  } catch (error) {
+    console.error("Error in getData:", error);
+    return { data: null, gameRef: null };
+  }
 };
 
 interface UpdateDataParams {

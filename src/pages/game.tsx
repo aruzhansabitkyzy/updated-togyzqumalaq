@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Board } from "../components/Board";
 import { Sidebar } from "../components/Sidebar";
-import { OtauInfo, Player } from "../types";
+import { OtauInfo } from "../types";
 import { useGameSync } from "../hooks/useGameSync";
 import { lsGet, resetGame } from "../services/api";
 import { Popup } from "../components/modals/Popup";
@@ -140,7 +140,7 @@ export const Game = () => {
         onAction={onReset}
         showConfetti
         title={
-          currentUserId === gameDoc?.winner?.id
+          gameDoc?.winner && currentUserId === gameDoc?.winner?.id
             ? "Congratulations! You won!"
             : "Oh no, you lose!"
         }

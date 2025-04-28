@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "./Button";
@@ -59,8 +59,10 @@ export const Sidebar = () => {
 
   const onExit = () => {
     const gameId = lsGet("id", "");
+    console.log("gameId", gameId);
     if (gameId) {
       leaveMutation.mutate({ room: gameId });
+      navigate("/");
     }
     setIsLeaveRoomModalOpen(false);
   };
@@ -68,7 +70,7 @@ export const Sidebar = () => {
   return (
     <>
       {(resetMutation.isPending || leaveMutation.isPending) && <Loading />}
-      <div className="w-1/4 h-[calc(100vh-200px)] flex flex-col justify-between items-center px-5">
+      <div className="w-1/4 h-[calc(100vh-200px)] flex flex-col justify-between items-center px-5 ">
         <PlayerTablo
           player={opponentUser?.[0]}
           currentTurn={currentPlayerTurn}

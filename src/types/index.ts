@@ -4,7 +4,7 @@ export interface Player {
   id: string;
   name: string;
   score: number;
-  tuzdyqOtauId: number
+  tuzdyqOtauId: number;
 }
 
 export interface OtauInfo {
@@ -24,4 +24,8 @@ export interface GameData {
   board: OtauInfo[];
   currentTurn: string;
   winner: Player | null;
+}
+
+export interface GameParams {
+  room: string;
 }

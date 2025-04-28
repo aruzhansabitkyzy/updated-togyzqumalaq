@@ -130,23 +130,25 @@ const isGameOver = (
   };
 
   const isPlayer1Lose = countVulnerableOtaus(player1.id) === 9;
-  const isPlayer2Lose = countVulnerableOtaus(player2.id) === 9;
+  const isPlayer2Lose = player2 && countVulnerableOtaus(player2?.id) === 9;
 
   const isPlayer1Winner = player1?.score >= GAME_CONSTANTS.WINNING_SCORE;
-  const isPlayer2Winner = player2?.score >= GAME_CONSTANTS.WINNING_SCORE;
+  const isPlayer2Winner =
+    player2 && player2?.score >= GAME_CONSTANTS.WINNING_SCORE;
 
   if (isPlayer1Lose || isPlayer2Winner) {
     updateGameState({
       winner: player2,
       status: "completed",
     });
+    setModalOpen(true);
   } else if (isPlayer2Lose || isPlayer1Winner) {
     updateGameState({
       winner: player1,
       status: "completed",
     });
+    setModalOpen(true);
   }
-  setModalOpen(true);
 };
 
 export { isGameOver, performMove };

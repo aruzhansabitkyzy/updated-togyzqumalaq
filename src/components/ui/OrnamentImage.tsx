@@ -9,7 +9,7 @@ const OrnamentImage = (props: {
       alt=""
       width={props.width}
       height={props.height}
-      style={{ transform: props.style }}
+      style={{ transform: props.style, filter: "invert(1)" }}
     />
   );
 };

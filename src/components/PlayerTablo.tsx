@@ -24,7 +24,7 @@ export const PlayerTablo = React.memo(
           player.id === currentTurn ? "bg-yellow-500" : "bg-gray-500"
         } rounded-lg p-3 shadow-md flex flex-col items-center gap-3 w-full`}
       >
-        <p>Name: {player.name}</p>
+        <p>{player.name}</p>
         <p>Score: {player.score}</p>
       </div>
     );
